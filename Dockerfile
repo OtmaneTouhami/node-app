@@ -1,13 +1,17 @@
-FROM node:18
+FROM node:18-alpine AS build
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+RUN npm install --production
 
-RUN npm install
+FROM node:18-alpine
 
+WORKDIR /usr/src/app
+
+COPY --from=build /usr/src/app/node_modules ./node_modules
 COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
